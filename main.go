@@ -18,4 +18,6 @@ func main() {
 	global.Config = core.ReadConf()
 	global.DB = core.InitDB()
 	core.InitLogrus()
+
+	core.InitIPDB()
 }
