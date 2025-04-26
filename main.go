@@ -19,5 +19,6 @@ func main() {
 	global.DB = core.InitDB()
 	core.InitLogrus()
 
-	core.InitIPDB()
+	// core.InitIPDB()
+	flags.Run()
 }
