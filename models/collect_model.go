@@ -8,5 +8,4 @@ type CollectModel struct {
 	ArticleCount int       `json:"articleCount"`               // 收藏文章数量
 	UserID       uint      `json:"userID"`                     // 用户id
 	UserModel    UserModel `gorm:"foreignKey:UserID" json:"-"` // 用户信息
-
 }
