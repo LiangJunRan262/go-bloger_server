@@ -14,21 +14,15 @@ import (
 func ReadConf() (c *conf.Config) {
 	byteData, err := os.ReadFile(flags.FlagOptions.File)
 	if err != nil {
-		panic(err) // TODO: обработать ошибку чтения конфигурации
+		panic(err)
 	}
 
 	c = new(conf.Config)
 
-	// var conf Config
-
 	err = yaml.Unmarshal(byteData, c)
 	if err != nil {
-		panic(fmt.Sprintf("yaml配置文件格式错误 %s", err)) // TODO: обработать ошибку парсинга конфигурации
+		panic(fmt.Sprintf("yaml配置文件格式错误 %s", err))
 	}
-
-	fmt.Println(c)
-	fmt.Println(c.System.Ip)
-	fmt.Println(c.System.Port)
 
 	return
 }
