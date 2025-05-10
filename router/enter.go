@@ -2,21 +2,21 @@ package router
 
 import (
 	"bloger_server/global"
+	"bloger_server/middleware"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Run() {
-	fmt.Println("addr", global.Config.System.GetAddr())
-
 	// 启动web服务
 	r := gin.Default()
 
-	fmt.Println("addr", global.Config.System.GetAddr())
-
 	// 注册路由
 	nr := r.Group("/api")
+
+	// 注册中间件
+	nr.Use(middleware.LogMiddleware)
 
 	SiteRouter(nr)
 
