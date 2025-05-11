@@ -17,4 +17,5 @@ type LogModel struct {
 	Username    string            `gorm:"size:32" json:"username"`    // 用户名
 	Password    string            `gorm:"size:32" json:"password"`    // 密码 (脱敏处理)
 	LoginType   enum.LoginType    `json:"loginType"`                  // 登录类型 1:账号密码登录 2:验证码登录 3:第三方登录
+	Service     string            `gorm:"size:32" json:"service"`     // 服务器名
 }

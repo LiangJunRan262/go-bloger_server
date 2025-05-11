@@ -98,7 +98,6 @@ func (ac *ActionLog) SetItemWarn(label string, value any) {
 	ac.SetItem(label, value, enum.LogWarnLevel)
 }
 func (ac *ActionLog) SetItemErr(label string, value any) {
-	fmt.Printf("??????" + label + "\n")
 	// 如果value是error类型
 	if err, ok := value.(error); ok {
 		msg := e.WithStack(err)
