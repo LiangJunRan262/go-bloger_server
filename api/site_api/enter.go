@@ -1,7 +1,7 @@
 package site_api
 
 import (
-	"bloger_server/models/enum"
+	"bloger_server/common/res"
 	log_service "bloger_server/service/log_servive"
 	"time"
 
@@ -12,11 +12,7 @@ type SiteApi struct {
 }
 
 func (SiteApi) SiteInfoView(c *gin.Context) {
-	log_service.NewLoginSuccess(c, enum.UserPwdLoginType)
-	log_service.NewLoginFail(c, enum.UserPwdLoginType, "登录失败", "admin", "123456")
-	c.JSON(200, gin.H{
-		"message": "pong",
-	})
+	res.Ok("data", "成功", c)
 	return
 }
 
@@ -37,17 +33,11 @@ func (SiteApi) SiteUpdateView(c *gin.Context) {
 	err := c.ShouldBindJSON(&cr)
 	if err != nil {
 		log.SetItemErr("错误信息", err)
-		c.JSON(400, gin.H{
-			"message": "参数错误",
-		})
+		res.FailWidthError(err, c)
 		return
 	}
 
 	log.SetItemInfo("cr", cr)
-	//log.SetItemErr("错误信息", 123123321)
-
-	c.JSON(200, gin.H{
-		"message": "pong",
-	})
+	res.OkWithMsg("更新成功", c)
 	return
 }
