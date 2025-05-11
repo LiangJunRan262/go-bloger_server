@@ -3,11 +3,9 @@ package site_api
 import (
 	"bloger_server/models/enum"
 	log_service "bloger_server/service/log_servive"
-	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type SiteApi struct {
@@ -38,8 +36,6 @@ func (SiteApi) SiteUpdateView(c *gin.Context) {
 	var cr SiteUpdateRequest
 	err := c.ShouldBindJSON(&cr)
 	if err != nil {
-		fmt.Println(err.Error())
-		logrus.Errorf("参数错误: %v", err.Error())
 		log.SetItemErr("错误信息", err)
 		c.JSON(400, gin.H{
 			"message": "参数错误",

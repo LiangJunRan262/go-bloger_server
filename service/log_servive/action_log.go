@@ -8,10 +8,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	e "github.com/pkg/errors"
 	"io"
 	"net/http"
 	"reflect"
+
+	e "github.com/pkg/errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -47,6 +48,7 @@ type ActionLog struct {
 	showResponse       bool
 	showResponseHeader bool
 	content            ContentType
+	isMiddlewareSave   bool
 }
 
 func (c *ActionLog) SetShowRequest() {
@@ -99,13 +101,11 @@ func (ac *ActionLog) SetItemErr(label string, value any) {
 	fmt.Printf("??????" + label + "\n")
 	// 如果value是error类型
 	if err, ok := value.(error); ok {
-		// 打印错误堆栈信息
-		fmt.Println("????????????????????????" + err.Error())
 		msg := e.WithStack(err)
-		errMsg := fmt.Sprintf("%v\n", msg)
-		fmt.Println(errMsg)
-		value = errMsg
+		stackTrace := fmt.Sprintf("%+v\n", msg)
+		value = stackTrace
 	}
+	logrus.Errorf("参数绑定错误: %+v\n", value)
 	ac.SetItem(label, value, enum.LogErrLevel)
 }
 
@@ -129,13 +129,30 @@ func (ac *ActionLog) SetResponseHeader(header http.Header) {
 	ac.content.ResponseHeader = string(json)
 }
 
-func (ac *ActionLog) Save() {
+// 专门给gin使用的中间件
+func (ac *ActionLog) MiddlewareSave() {
+	if ac.log == nil {
+		ac.isMiddlewareSave = true
+		ac.Save()
+		return
+	}
+	// 在视图里save过，属于更新
+	// 设置响应
+	if ac.showResponse {
+		ac.content.ResponseBody = string(ac.responseBody)
+	}
+}
+
+// TODO: 当前log.Sava() 只在中间件最后执行， 之后优化
+func (ac *ActionLog) Save() (id uint) {
+	if ac.log == nil && ac.c.GetBool("saveLog") == false {
+		return 0
+	}
+
+	// TODO: 这里需要判断是否是中间件保存的，因为中间件保存的话，需要在视图里保存
 	// 若已存在日志，则更新日志内容，否则创建新日志
 	if ac.log != nil {
-		// global.DB.Model(ac.log).Updates(map[string]any{
-		// 	"title": "更新操作日志",
-		// })
-		return
+		return ac.log.ID
 	}
 
 	// 设置请求
@@ -146,14 +163,13 @@ func (ac *ActionLog) Save() {
 		json, _ := json.Marshal(ac.c.Request.Header)
 		ac.content.RequestHeader = string(json)
 	}
-	// 设置响应
-	if ac.showResponse {
-		ac.content.ResponseBody = string(ac.responseBody)
+	if ac.isMiddlewareSave {
+		// 设置响应
+		if ac.showResponse {
+			ac.content.ResponseBody = string(ac.responseBody)
+		}
 	}
-	// if ac.showResponseHeader {
-	// 	json, _ := json.Marshal(ac.c.Request.Response.Header)
-	// 	ac.content.ResponseHeader = string(json)
-	// }
+
 	contentStr, contentStrErr := json.Marshal(ac.content)
 	if contentStrErr != nil {
 		logrus.Errorf("序列化操作日志失败 %s", contentStrErr.Error())
@@ -178,6 +194,8 @@ func (ac *ActionLog) Save() {
 		logrus.Errorf("保存操作日志失败 %s", err.Error())
 	}
 	ac.log = &log
+
+	return log.ID
 }
 
 func NewActionLogByGin(c *gin.Context) *ActionLog {
@@ -196,6 +214,7 @@ func NewActionLogByGin(c *gin.Context) *ActionLog {
 }
 
 func GetActionLog(c *gin.Context) *ActionLog {
+	c.Set("saveLog", true)
 	ac, exists := c.Get("log")
 	if !exists {
 		return NewActionLogByGin(c)
