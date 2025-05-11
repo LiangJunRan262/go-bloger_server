@@ -3,14 +3,17 @@ package router
 import (
 	"bloger_server/global"
 	"bloger_server/middleware"
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 )
 
 func Run() {
+	gin.SetMode(global.Config.System.GinMode)
+
 	// 启动web服务
 	r := gin.Default()
+
+	// 注册静态文件
+	r.Static("/static", "./static")
 
 	// 注册路由
 	nr := r.Group("/api")
@@ -21,6 +24,5 @@ func Run() {
 	SiteRouter(nr)
 
 	addr := global.Config.System.GetAddr()
-	fmt.Println("addr", addr)
 	r.Run(addr)
 }
