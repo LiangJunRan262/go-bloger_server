@@ -9,4 +9,6 @@ func LogRouter(r *gin.RouterGroup) {
 	app := api.App.LogApi
 
 	r.GET("/log_list", app.LogListView)
+
+	r.GET("/log_read/:id", app.LogReadView)
 }
