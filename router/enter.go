@@ -22,7 +22,11 @@ func Run() {
 	nr.Use(middleware.LogMiddleware)
 
 	SiteRouter(nr)
+	LogRouter(nr)
 
 	addr := global.Config.System.GetAddr()
-	r.Run(addr)
+	err := r.Run(addr)
+	if err != nil {
+		return
+	}
 }
