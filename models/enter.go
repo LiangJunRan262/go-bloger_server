@@ -11,3 +11,7 @@ type Model struct {
 type IDRequest struct {
 	ID uint `uri:"id" form:"id" json:"id"`
 }
+
+type DeleteRequest struct {
+	IDs []uint `uri:"ids" form:"ids" json:"ids"`
+}

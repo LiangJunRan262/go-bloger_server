@@ -11,4 +11,7 @@ func LogRouter(r *gin.RouterGroup) {
 	r.GET("/log_list", app.LogListView)
 
 	r.GET("/log_read/:id", app.LogReadView)
+
+	// 删除日志
+	r.POST("/log_delete", app.LogDeleteView)
 }
