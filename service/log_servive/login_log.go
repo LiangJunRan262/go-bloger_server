@@ -5,6 +5,7 @@ import (
 	"bloger_server/global"
 	"bloger_server/models"
 	"bloger_server/models/enum"
+	"bloger_server/utils/jwts"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,9 +15,17 @@ func NewLoginSuccess(c *gin.Context, loginType enum.LoginType) {
 	addr := core.GetIPAddr(ip)
 
 	// token := c.GetHeader("token")
-	userID := uint(1)   // 假设从token中获取用户ID，这里简化为1
-	Username := "admin" // 假设从token中获取用户名，这里简化为"admin"
+	//userID := uint(1)   // 假设从token中获取用户ID，这里简化为1
+	//Username := "admin" // 假设从token中获取用户名，这里简化为"admin"
 	// Password := "123456" // 假设从token中获取密码，这里简化为"123456"
+
+	claims, err := jwts.ParseTokenByGin(c)
+	userID := uint(0)
+	Username := ""
+	if err == nil && claims != nil {
+		userID = claims.UserID
+		Username = claims.Username
+	}
 
 	loginLog := &models.LogModel{
 		LogType:     enum.LoginLogType, // 假设转换方式为 enum.LoginLogType(loginType),

@@ -5,6 +5,7 @@ import (
 	"bloger_server/global"
 	"bloger_server/models"
 	"bloger_server/models/enum"
+	"bloger_server/utils/jwts"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -176,7 +177,11 @@ func (ac *ActionLog) Save() (id uint) {
 
 	ip := ac.c.ClientIP()
 	addr := core.GetIPAddr(ip)
-	userID := uint(1)
+	claims, err := jwts.ParseTokenByGin(ac.c)
+	userID := uint(0)
+	if err == nil && claims != nil {
+		userID = claims.UserID
+	}
 
 	log := models.LogModel{
 		LogType: enum.ActionLogType,
@@ -188,7 +193,7 @@ func (ac *ActionLog) Save() (id uint) {
 		Address: addr,
 	}
 
-	err := global.DB.Create(&log).Error
+	err = global.DB.Create(&log).Error
 	if err != nil {
 		logrus.Errorf("保存操作日志失败 %s", err.Error())
 	}
