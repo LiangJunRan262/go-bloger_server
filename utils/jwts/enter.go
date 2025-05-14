@@ -13,12 +13,6 @@ import (
 // 这个比较新
 //import "github.com/golang-jwt/jwt/v5"
 
-// TokenExpiredDuration 过期时间
-var TokenExpiredDuration = time.Hour * time.Duration(global.Config.JWT.Expire) // 1天
-
-// Secret 密钥
-var Secret = []byte(global.Config.JWT.Secret)
-
 type Claims struct {
 	UserID   uint   `json:"user_id"`
 	Username string `json:"user_name"`
@@ -35,13 +29,13 @@ func GenToken(claims Claims) (string, error) {
 	cla := MyClaims{
 		Claims: claims,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(TokenExpiredDuration).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * time.Duration(global.Config.JWT.Expire)).Unix(),
 			Issuer:    global.Config.JWT.Issuer,
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, cla)
 	fmt.Println(token)
-	return token.SignedString(Secret)
+	return token.SignedString([]byte(global.Config.JWT.Secret))
 }
 
 // 解析token
@@ -51,7 +45,7 @@ func parseToken(tokenString string) (*MyClaims, error) {
 	}
 
 	token, err := jwt.ParseWithClaims(tokenString, &MyClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return Secret, nil
+		return []byte(global.Config.JWT.Secret), nil
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "token is expired") {

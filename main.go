@@ -14,6 +14,7 @@ func main() {
 	flags.Parse()
 	global.Config = core.ReadConf()
 	global.DB = core.InitDB()
+	global.Redis = core.InitRedis()
 	core.InitLogrus()
 
 	// 初始化数
