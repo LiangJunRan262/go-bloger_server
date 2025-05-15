@@ -4,6 +4,7 @@ import (
 	"bloger_server/global"
 	"bloger_server/utils/jwts"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -19,16 +20,20 @@ const (
 
 func (b BlackType) String() string {
 	return fmt.Sprintf("%d", b)
-	//switch b {
-	//case UserBlackToken:
-	//	return "用户token"
-	//case AdminBlackType:
-	//	return "管理员手动下线"
-	//case DeviceBlackType:
-	//	return "设备把自己挤掉了"
-	//default:
-	//	return "未知"
-	//}
+
+}
+
+func (b BlackType) Msg() string {
+	switch b {
+	case UserBlackToken:
+		return "已注销"
+	case AdminBlackType:
+		return "禁止登录"
+	case DeviceBlackType:
+		return "设备下线"
+	default:
+		return "未知"
+	}
 }
 
 func ParseBlackTyoe(val string) BlackType {
@@ -76,4 +81,15 @@ func HasTokenBlack(token string) (blk BlackType, ok bool) {
 	}
 	blk = ParseBlackTyoe(value)
 	return blk, true
+}
+
+func HasTokenBlackByGin(c *gin.Context) (blk BlackType, ok bool) {
+	token := c.Request.Header.Get("token")
+	if token == "" {
+		token = c.GetHeader("token")
+	}
+	if token == "" {
+		token = c.Query("token")
+	}
+	return HasTokenBlack(token)
 }

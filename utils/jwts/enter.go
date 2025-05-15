@@ -2,6 +2,7 @@ package jwts
 
 import (
 	"bloger_server/global"
+	"bloger_server/models/enum"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -14,9 +15,9 @@ import (
 //import "github.com/golang-jwt/jwt/v5"
 
 type Claims struct {
-	UserID   uint   `json:"user_id"`
-	Username string `json:"user_name"`
-	Role     int8   `json:"role"`
+	UserID   uint          `json:"user_id"`
+	Username string        `json:"user_name"`
+	Role     enum.RoleType `json:"role"`
 }
 
 type MyClaims struct {
@@ -69,9 +70,9 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 }
 
 func ParseTokenByGin(c *gin.Context) (*MyClaims, error) {
-	token := c.Request.Header.Get("Authorization")
+	token := c.Request.Header.Get("token")
 	if token == "" {
-		token = c.GetHeader("Authorization")
+		token = c.GetHeader("token")
 	}
 	if token == "" {
 		token = c.Query("token")
