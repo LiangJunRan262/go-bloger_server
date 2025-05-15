@@ -2,8 +2,6 @@ package core
 
 import (
 	"bloger_server/global"
-	"context"
-
 	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
 )
@@ -17,7 +15,8 @@ func InitRedis() *redis.Client {
 		Password: r.Password, // 密码
 		DB:       r.DB,       // 默认是0
 	})
-	_, err := redisDB.Ping(context.Background()).Result()
+
+	_, err := redisDB.Ping(global.CommonContext).Result()
 	if err != nil {
 		logrus.Fatalf("redis链接失败: %s", err.Error())
 	}

@@ -39,7 +39,7 @@ func GenToken(claims Claims) (string, error) {
 }
 
 // 解析token
-func parseToken(tokenString string) (*MyClaims, error) {
+func ParseToken(tokenString string) (*MyClaims, error) {
 	if tokenString == "" {
 		return nil, errors.New("tokenString is empty")
 	}
@@ -76,5 +76,5 @@ func ParseTokenByGin(c *gin.Context) (*MyClaims, error) {
 	if token == "" {
 		token = c.Query("token")
 	}
-	return parseToken(token)
+	return ParseToken(token)
 }
